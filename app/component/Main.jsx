@@ -170,7 +170,9 @@ function Main() {
             <button className="btn" onClick={writeKey}>
               Store large blob
             </button>
-            <button className="btn">logout</button>
+            <button className="btn" onClick={() => setStep(1)}>
+              logout
+            </button>
           </div>
 
           <div>
