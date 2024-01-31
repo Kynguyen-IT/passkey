@@ -20,8 +20,8 @@ function Main() {
     try {
       const credential = await navigator.credentials.create({
         publicKey: {
-          attestation: "enterprise",
-          requireResidentKey: true,
+          // attestation: "enterprise",
+          // requireResidentKey: true,
           challenge: new Uint8Array([183, 148, 245]),
           rp: {
             name: "Test",
