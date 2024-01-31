@@ -25,7 +25,7 @@ function Main() {
           challenge: new Uint8Array([183, 148, 245]),
           rp: {
             name: "Test",
-            id: "passkey-flame.vercel",
+            id: "passkey-flame.vercel.app",
           },
           user: {
             id: new ArrayBuffer(2), // Create a unique user ID based on username
@@ -76,7 +76,7 @@ function Main() {
       const result = await navigator.credentials.get({
         publicKey: {
           challenge: new Uint8Array([183, 148, 245]),
-          rpId: "passkey-flame.vercel",
+          rpId: "passkey-flame.vercel.app",
         },
       });
       console.log(result.response);
