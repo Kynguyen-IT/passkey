@@ -93,7 +93,7 @@ function Main() {
       return await navigator.credentials.get({
         publicKey: {
           challenge: new Uint8Array([183, 148, 245]),
-          rpId: "passkey-flame.vercel",
+          rpId: "passkey-flame.vercel.app",
           extensions: {
             largeBlob: {
               write: str2ab(keyInput), // Include data in the extension
@@ -108,9 +108,9 @@ function Main() {
 
   const readKey = useCallback(async () => {
     const assertion = await navigator.credentials.get({
-      mediation: "silent",
       publicKey: {
         challenge: new Uint8Array([183, 148, 245]),
+        rpId: "passkey-flame.vercel.app",
         extensions: {
           largeBlob: {
             read: true, // Include data in the extension
