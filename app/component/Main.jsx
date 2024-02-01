@@ -5,6 +5,7 @@ function Main() {
   const [username, setUsername] = useState("");
   const [keyInput, setKeyInput] = useState("");
   const [resultKey, setResultKey] = useState("");
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,6 +19,7 @@ function Main() {
   // Registration function
   async function registerUser(displayName) {
     try {
+      setError(null);
       const credential = await navigator.credentials.create({
         publicKey: {
           // attestation: "enterprise",
@@ -47,10 +49,12 @@ function Main() {
       console.log(credential.getClientExtensionResults().largeBlob);
       if (credential.getClientExtensionResults().largeBlob.supported) {
         console.log("supported largeBlob");
+        setError("supported");
       }
       setStep(1);
     } catch (error) {
-      console.error("Registration error:", error);
+      setError(error.message);
+      console.error("Registration error:", error.message);
     }
   }
 
@@ -75,6 +79,7 @@ function Main() {
   // Authentication credentials
   async function auth() {
     try {
+      setError(null);
       const result = await navigator.credentials.get({
         publicKey: {
           challenge: new Uint8Array([183, 148, 245]),
@@ -85,6 +90,7 @@ function Main() {
 
       setStep(3);
     } catch (error) {
+      setError(error.message);
       console.error("Authentication error:", error);
     }
   }
@@ -92,6 +98,7 @@ function Main() {
   // write key to credentials
   const writeKey = useCallback(async () => {
     try {
+      setError(null);
       const credential = await navigator.credentials.get({
         publicKey: {
           challenge: new Uint8Array([183, 148, 245]),
@@ -108,6 +115,7 @@ function Main() {
       });
       console.log(credential.getClientExtensionResults().largeBlob);
     } catch (error) {
+      setError(error.message);
       console.error("Authentication error:", error);
     }
   }, [keyInput]);
@@ -194,7 +202,14 @@ function Main() {
     [handleSubmit, username, keyInput, writeKey, resultKey, readKey]
   );
 
-  return <>{renderStep[step]()} </>;
+  console.log({ error });
+
+  return (
+    <div>
+      <p style={{ color: "red" }}>{error}</p>
+      {renderStep[step]()}
+    </div>
+  );
 }
 
 export default Main;
