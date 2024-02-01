@@ -199,7 +199,7 @@ function Main() {
     setResultKey(key);
     const redirectUrl =
       "https://passkey-flame.vercel.app?redirect=" +
-      encodeURIComponent(`napa:\\${key}`);
+      encodeURIComponent(`napa://${key}`);
 
     console.log(redirectUrl);
 
