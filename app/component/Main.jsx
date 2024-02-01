@@ -174,6 +174,31 @@ function Main() {
     }
   }, [keyInput]);
 
+  const messageHandler = (key) => {
+    // Construct URL with parameters
+    const url = `napa://?key=${key}`;
+
+    // Trigger native iOS app navigation
+    if (navigator.userAgent.includes("Safari")) {
+      // For Safari on iOS
+      window.location = url;
+    } else {
+      // For other browsers or non-iOS platforms
+      let xhr = new XMLHttpRequest();
+      xhr.open("GET", url);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          // Successful navigation to native app
+          alert("Parameters passed successfully");
+        } else {
+          // Navigation error
+          alert("Failed to open native app: " + xhr.statusText);
+        }
+      };
+      xhr.send();
+    }
+  };
+
   const readKey = useCallback(async () => {
     const assertion = await navigator.credentials.get({
       publicKey: {
@@ -197,13 +222,8 @@ function Main() {
     });
     const key = ab2str(assertion.getClientExtensionResults().largeBlob.blob);
     setResultKey(key);
-    const redirectUrl =
-      "https://passkey-flame.vercel.app?redirect=" +
-      encodeURIComponent(`napa://${key}`);
 
-    console.log(redirectUrl);
-
-    window.location.href = redirectUrl;
+    messageHandler(key);
   }, []);
 
   const renderStep = useMemo(
