@@ -27,7 +27,7 @@ function Main() {
           challenge: new Uint8Array([183, 148, 245]),
           rp: {
             name: "Test",
-            id: "localhost",
+            id: "passkey-flame.vercel.app",
           },
           user: {
             id: new ArrayBuffer(2), // Create a unique user ID based on username
@@ -87,7 +87,7 @@ function Main() {
       const result = await navigator.credentials.get({
         publicKey: {
           challenge: new Uint8Array([183, 148, 245]),
-          rpId: "localhost",
+          rpId: "passkey-flame.vercel.app",
         },
       });
       console.log(result.response);
@@ -106,7 +106,7 @@ function Main() {
       const credential = await navigator.credentials.get({
         publicKey: {
           challenge: new Uint8Array([183, 148, 245]),
-          rpId: "localhost",
+          rpId: "passkey-flame.vercel.app",
           authenticatorSelection: {
             residentKey: "preferred", // Or "required".
           },
@@ -128,7 +128,7 @@ function Main() {
     const assertion = await navigator.credentials.get({
       publicKey: {
         challenge: new Uint8Array([183, 148, 245]),
-        rpId: "localhost",
+        rpId: "passkey-flame.vercel.app",
         extensions: {
           largeBlob: {
             read: true, // Include data in the extension
