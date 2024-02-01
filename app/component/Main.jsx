@@ -43,6 +43,8 @@ function Main() {
           },
         },
       });
+
+      console.log(credential.getClientExtensionResults().largeBlob);
       if (credential.getClientExtensionResults().largeBlob.supported) {
         console.log("supported largeBlob");
       }
@@ -90,10 +92,13 @@ function Main() {
   // write key to credentials
   const writeKey = useCallback(async () => {
     try {
-      return await navigator.credentials.get({
+      const credential = await navigator.credentials.get({
         publicKey: {
           challenge: new Uint8Array([183, 148, 245]),
           rpId: "passkey-flame.vercel.app",
+          authenticatorSelection: {
+            residentKey: "preferred", // Or "required".
+          },
           extensions: {
             largeBlob: {
               write: str2ab(keyInput), // Include data in the extension
@@ -101,6 +106,7 @@ function Main() {
           }, // Create a unique challenge value
         },
       });
+      console.log(credential.getClientExtensionResults().largeBlob);
     } catch (error) {
       console.error("Authentication error:", error);
     }
