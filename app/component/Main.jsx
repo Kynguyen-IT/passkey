@@ -12,14 +12,46 @@ function Main() {
     registerUser(username);
   };
 
-  const challenge = useMemo(() => {
-    return new Uint8Array([183, 148, 245]);
-  }, []);
+  function randomIntFromInterval(min, max) {
+    // min and max included
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
 
   // Registration function
   async function registerUser(displayName) {
     try {
       setError(null);
+      const publicKey = {
+        challenge: new Uint8Array([183, 148, 245]),
+        rp: { name: "Passkey", id: "passkey-flame.vercel.app" },
+        user: {
+          id: new ArrayBuffer(
+            randomIntFromInterval(1, 100),
+            randomIntFromInterval(1, 100),
+            randomIntFromInterval(1, 100)
+          ),
+          name: "123",
+          displayName: "123",
+        },
+        pubKeyCredParams: [
+          { type: "public-key", alg: -7 },
+          { type: "public-key", alg: -257 },
+        ],
+        timeout: 1800000,
+        attestation: "none",
+        excludeCredentials: [],
+        authenticatorSelection: {
+          authenticatorAttachment: "platform",
+          requireResidentKey: true,
+          residentKey: "required",
+          userVerification: "required",
+        },
+        extensions: {
+          largeBlob: {
+            support: "preferred", // Or "required".
+          },
+        },
+      };
       const credential = await navigator.credentials.create({
         publicKey: {
           // attestation: "enterprise",
@@ -88,9 +120,18 @@ function Main() {
         publicKey: {
           challenge: new Uint8Array([183, 148, 245]),
           rpId: "passkey-flame.vercel.app",
+          timeout: 1800000,
+          attestation: "none",
+          excludeCredentials: [],
+          authenticatorSelection: {
+            authenticatorAttachment: "platform",
+            requireResidentKey: true,
+            residentKey: "required",
+            userVerification: "required",
+          },
         },
       });
-      console.log(result.response);
+      console.log("data", result.getClientExtensionResults());
 
       setStep(3);
     } catch (error) {
@@ -109,6 +150,15 @@ function Main() {
           rpId: "passkey-flame.vercel.app",
           authenticatorSelection: {
             residentKey: "preferred", // Or "required".
+          },
+          timeout: 1800000,
+          attestation: "none",
+          excludeCredentials: [],
+          authenticatorSelection: {
+            authenticatorAttachment: "platform",
+            requireResidentKey: true,
+            residentKey: "required",
+            userVerification: "required",
           },
           extensions: {
             largeBlob: {
@@ -129,6 +179,15 @@ function Main() {
       publicKey: {
         challenge: new Uint8Array([183, 148, 245]),
         rpId: "passkey-flame.vercel.app",
+        timeout: 1800000,
+        attestation: "none",
+        excludeCredentials: [],
+        authenticatorSelection: {
+          authenticatorAttachment: "platform",
+          requireResidentKey: true,
+          residentKey: "required",
+          userVerification: "required",
+        },
         extensions: {
           largeBlob: {
             read: true, // Include data in the extension
@@ -136,7 +195,15 @@ function Main() {
         },
       },
     });
-    setResultKey(ab2str(assertion.getClientExtensionResults().largeBlob.blob));
+    const key = ab2str(assertion.getClientExtensionResults().largeBlob.blob);
+    setResultKey(key);
+    const redirectUrl =
+      "https://passkey-flame.vercel.app?redirect=" +
+      encodeURIComponent(`napa:\\${key}`);
+
+    console.log(redirectUrl);
+
+    window.location.href = redirectUrl;
   }, []);
 
   const renderStep = useMemo(
