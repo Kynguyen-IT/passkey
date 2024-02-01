@@ -202,8 +202,6 @@ function Main() {
     [handleSubmit, username, keyInput, writeKey, resultKey, readKey]
   );
 
-  console.log({ error });
-
   return (
     <div>
       <p style={{ color: "red" }}>{error}</p>
