@@ -1,15 +1,17 @@
+"use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 function Main() {
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState("");
+  const [key, setKey] = useState("");
   const [keyInput, setKeyInput] = useState("");
   const [resultKey, setResultKey] = useState("");
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    registerUser(username);
+    registerUser();
   };
 
   function randomIntFromInterval(min, max) {
@@ -17,81 +19,131 @@ function Main() {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
+  function ab2str(buf) {
+    return String.fromCharCode.apply(null, new Uint16Array(buf));
+  }
+
   // Registration function
-  async function registerUser(displayName) {
-    try {
-      setError(null);
-      const publicKey = {
-        challenge: new Uint8Array([183, 148, 245]),
-        rp: { name: "Passkey", id: "passkey-flame.vercel.app" },
-        user: {
-          id: new ArrayBuffer(
-            randomIntFromInterval(1, 100),
-            randomIntFromInterval(1, 100),
-            randomIntFromInterval(1, 100)
-          ),
-          name: "123",
-          displayName: "123",
-        },
-        pubKeyCredParams: [
-          { type: "public-key", alg: -7 },
-          { type: "public-key", alg: -257 },
-        ],
-        timeout: 1800000,
-        attestation: "none",
-        excludeCredentials: [],
-        authenticatorSelection: {
-          authenticatorAttachment: "platform",
-          requireResidentKey: true,
-          residentKey: "required",
-          userVerification: "required",
-        },
-        extensions: {
-          largeBlob: {
-            support: "preferred", // Or "required".
-          },
-        },
-      };
-      const credential = await navigator.credentials.create({
-        publicKey: {
-          // attestation: "enterprise",
-          // requireResidentKey: true,
-          challenge: new Uint8Array([183, 148, 245]),
-          rp: {
-            name: "Test",
-            id: "passkey-flame.vercel.app",
-          },
-          user: {
-            id: new ArrayBuffer(2), // Create a unique user ID based on username
-            name: displayName,
-            displayName: displayName,
-          },
-          pubKeyCredParams: [
-            { type: "public-key", alg: -7 },
-            { type: "public-key", alg: -8 },
-            { type: "public-key", alg: -257 },
-          ],
-          authenticatorSelection: {
-            residentKey: "required", // Or "required".
-          },
-          extensions: {
-            largeBlob: {
-              support: "preferred", // Or "required".
-            },
-          },
-        },
+  async function registerUser() {
+    // try {
+    //   setError(null);
+    //   const publicKey = {
+    //     challenge: new Uint8Array([183, 148, 245]),
+    //     rp: { name: "Passkey", id: "passkey-flame.vercel.app" },
+    //     user: {
+    //       id: new ArrayBuffer(
+    //         randomIntFromInterval(1, 100),
+    //         randomIntFromInterval(1, 100),
+    //         randomIntFromInterval(1, 100)
+    //       ),
+    //       name: "123",
+    //       displayName: "123",
+    //     },
+    //     pubKeyCredParams: [
+    //       { type: "public-key", alg: -7 },
+    //       { type: "public-key", alg: -257 },
+    //     ],
+    //     timeout: 1800000,
+    //     attestation: "none",
+    //     excludeCredentials: [],
+    //     authenticatorSelection: {
+    //       authenticatorAttachment: "platform",
+    //       requireResidentKey: true,
+    //       residentKey: "required",
+    //       userVerification: "required",
+    //     },
+    //     extensions: {
+    //       largeBlob: {
+    //         support: "preferred", // Or "required".
+    //       },
+    //     },
+    //   };
+
+    //   const credential = await navigator.credentials.create({
+    //     publicKey: {
+    //       // attestation: "enterprise",
+    //       // requireResidentKey: true,
+    //       challenge: new Uint8Array([183, 148, 245]),
+    //       rp: {
+    //         name: "Test",
+    //         id: "passkey-flame.vercel.app",
+    //       },
+    //       user: {
+    //         id: new ArrayBuffer(2), // Create a unique user ID based on username
+    //         name: displayName,
+    //         displayName: displayName,
+    //       },
+    //       pubKeyCredParams: [
+    //         { type: "public-key", alg: -7 },
+    //         { type: "public-key", alg: -8 },
+    //         { type: "public-key", alg: -257 },
+    //       ],
+    //       authenticatorSelection: {
+    //         residentKey: "required", // Or "required".
+    //       },
+    //       extensions: {
+    //         largeBlob: {
+    //           support: "preferred", // Or "required".
+    //         },
+    //       },
+    //     },
+    //   });
+
+    //   console.log(credential.getClientExtensionResults().largeBlob);
+    //   if (credential.getClientExtensionResults().largeBlob.supported) {
+    //     console.log("supported largeBlob");
+    //     setError("supported");
+    //   }
+    //   setStep(1);
+    // } catch (error) {
+    //   setError(error.message);
+    //   console.error("Registration error:", error.message);
+    // }
+
+    let publicKey;
+    console.log(JSON.stringify({ username }));
+    await fetch(`http://10.10.32.97:3001/register/start`, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({ username, key }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+
+        const uint8Array = new Uint8Array(data.challenge);
+
+        console.log(uint8Array.buffer);
+        publicKey = {
+          ...data,
+          challenge: uint8Array.buffer,
+          user: { ...data.user, id: str2ab(data.user.id) },
+        };
+
+        console.log(publicKey);
       });
 
-      console.log(credential.getClientExtensionResults().largeBlob);
-      if (credential.getClientExtensionResults().largeBlob.supported) {
-        console.log("supported largeBlob");
-        setError("supported");
-      }
-      setStep(1);
-    } catch (error) {
-      setError(error.message);
-      console.error("Registration error:", error.message);
-    }
+    console.log({ challenge: ab2str(publicKey.challenge) });
+
+    const credential = await navigator.credentials.create({
+      publicKey,
+    });
+
+    //     const data = await fido2Create(publicKey, username);
+
+    //     console.log({ data });
+
+    //     // this.http
+    //     //   .post("http://localhost:3001/register/finish", data)
+    //     //   .subscribe((data) => {
+    //     //     if (data) {
+    //     //       alert("Successfully created using webAuthn");
+    //     //     }
+    //     //   });
   }
 
   function str2ab(str) {
@@ -251,6 +303,13 @@ function Main() {
               placeholder="username"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
+            />
+            <input
+              className="input"
+              name="key"
+              placeholder="Key"
+              value={key}
+              onChange={(event) => setKey(event.target.value)}
             />
             <button className="btn" type="submit">
               Create account
