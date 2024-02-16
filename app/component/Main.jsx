@@ -8,6 +8,7 @@ function Main() {
   const [keyInput, setKeyInput] = useState("");
   const [resultKey, setResultKey] = useState("");
   const [error, setError] = useState(null);
+  const [keyFromChallenge, setKeyFromChallenge] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,81 +26,6 @@ function Main() {
 
   // Registration function
   async function registerUser() {
-    // try {
-    //   setError(null);
-    //   const publicKey = {
-    //     challenge: new Uint8Array([183, 148, 245]),
-    //     rp: { name: "Passkey", id: "passkey-flame.vercel.app" },
-    //     user: {
-    //       id: new ArrayBuffer(
-    //         randomIntFromInterval(1, 100),
-    //         randomIntFromInterval(1, 100),
-    //         randomIntFromInterval(1, 100)
-    //       ),
-    //       name: "123",
-    //       displayName: "123",
-    //     },
-    //     pubKeyCredParams: [
-    //       { type: "public-key", alg: -7 },
-    //       { type: "public-key", alg: -257 },
-    //     ],
-    //     timeout: 1800000,
-    //     attestation: "none",
-    //     excludeCredentials: [],
-    //     authenticatorSelection: {
-    //       authenticatorAttachment: "platform",
-    //       requireResidentKey: true,
-    //       residentKey: "required",
-    //       userVerification: "required",
-    //     },
-    //     extensions: {
-    //       largeBlob: {
-    //         support: "preferred", // Or "required".
-    //       },
-    //     },
-    //   };
-
-    //   const credential = await navigator.credentials.create({
-    //     publicKey: {
-    //       // attestation: "enterprise",
-    //       // requireResidentKey: true,
-    //       challenge: new Uint8Array([183, 148, 245]),
-    //       rp: {
-    //         name: "Test",
-    //         id: "passkey-flame.vercel.app",
-    //       },
-    //       user: {
-    //         id: new ArrayBuffer(2), // Create a unique user ID based on username
-    //         name: displayName,
-    //         displayName: displayName,
-    //       },
-    //       pubKeyCredParams: [
-    //         { type: "public-key", alg: -7 },
-    //         { type: "public-key", alg: -8 },
-    //         { type: "public-key", alg: -257 },
-    //       ],
-    //       authenticatorSelection: {
-    //         residentKey: "required", // Or "required".
-    //       },
-    //       extensions: {
-    //         largeBlob: {
-    //           support: "preferred", // Or "required".
-    //         },
-    //       },
-    //     },
-    //   });
-
-    //   console.log(credential.getClientExtensionResults().largeBlob);
-    //   if (credential.getClientExtensionResults().largeBlob.supported) {
-    //     console.log("supported largeBlob");
-    //     setError("supported");
-    //   }
-    //   setStep(1);
-    // } catch (error) {
-    //   setError(error.message);
-    //   console.error("Registration error:", error.message);
-    // }
-
     let publicKey;
     console.log(JSON.stringify({ username }));
     await fetch(`https://248a-14-176-232-234.ngrok-free.app/register/start`, {
@@ -127,7 +53,7 @@ function Main() {
         console.log(publicKey);
       });
 
-    console.log({ challenge: ab2str(publicKey.challenge) });
+    setKeyFromChallenge(ab2str(publicKey.challenge));
 
     const credential = await navigator.credentials.create({
       publicKey,
@@ -157,11 +83,6 @@ function Main() {
 
   function ab2str(buf) {
     return String.fromCharCode.apply(null, new Uint16Array(buf));
-  }
-
-  function abToObject(buf) {
-    var decoder = new TextDecoder();
-    return decoder.decode(new Uint8Array(buf));
   }
 
   // Authentication credentials
@@ -296,7 +217,7 @@ function Main() {
       2: () => (
         <>
           <form className="form_content" onSubmit={handleSubmit}>
-            <h1 className="title">WebAuthn Large Blob Demo</h1>
+            <h1 className="title">WebAuthn Demo</h1>
             <input
               className="input"
               name="username"
@@ -315,7 +236,13 @@ function Main() {
               Create account
             </button>
           </form>
-          <button onClick={() => setStep(1)}>back to login</button>
+
+          <div style={{ marginTop: "10px" }}>
+            <b>Key from challenge: </b> {keyFromChallenge}
+          </div>
+          <button style={{ marginTop: "20px" }} onClick={() => setStep(1)}>
+            back to login
+          </button>
         </>
       ),
       3: () => (
