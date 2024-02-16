@@ -102,7 +102,7 @@ function Main() {
 
     let publicKey;
     console.log(JSON.stringify({ username }));
-    await fetch(`http://10.10.32.97:3001/register/start`, {
+    await fetch(`https://248a-14-176-232-234.ngrok-free.app/register/start`, {
       method: "POST",
       mode: "cors",
       headers: {
